@@ -32,10 +32,6 @@ class State:
     def getHash(self):# get status of current board state
         self.boardHash = str(self.board.reshape(BOARD_COLS * BOARD_ROWS))
         # example: self.boardHash = "[-1.  0.  0.  1.  1. -1.  1. -1.  1. 1. -1. -1. 0. 0. 0. 0.]"
-
-        aa = {"aa":10}
-        aa.get("aa") => return: 10
-
         return self.boardHash
 
     #check if player matches win condition and decide winner player(if winner exits)
@@ -127,7 +123,7 @@ class State:
 
 
     def play(self, rounds=50000): # training function: computer vs computer
-        """ don't care about these codes
+        """
         color_dic = {"green":"\033[32m",
                      "yellow":"\033[33m",
                      "blue":"\033[34m",
@@ -230,7 +226,7 @@ class State:
 
 
 class Player:
-    def __init__(self, name,exp_rate=0.3):
+    def __init__(self, name,exp_rate=0.05):
         self.name = name # player name
         self.states = []  # record all positions taken
         self.lr = 0.2 # influence of total reward value (large influence)
@@ -271,6 +267,9 @@ class Player:
             if self.states_value.get(st) is None:
                 self.states_value[st] = 0
             self.states_value[st] += self.lr * (self.decay_gamma * reward - self.states_value[st]) # calculate real reward, formula: backpropagate method
+            """
+             self.Q[curr_action][curr_state] += self.alpha * (reward + self.gamma * self.Q[next_action][next_state] - self.Q[curr_action][curr_state])
+            """
             reward = self.states_value[st] # real reward
 
     def reset(self): # reset
@@ -308,20 +307,33 @@ class HumanPlayer: # human
     def reset(self): # no reset about human
         pass
 
+def get_state_array():
+    print(p1.states_value.keys())
+    print("-----------------------")
+    print("-----------------------")
+    print("-----------------------")
+    #print(p1.states_value.values())
+    
+
 if __name__ == "__main__":
-    p1 = Player("p1_4by4_100000") # set player1's name
+    p1 = Player("44_10million") # set player1's name
     p2 = Player("p2") # set player2's name
     st = State(p1, p2) # create an game board
 
-    print("training...")
-    st.play(100000)# training: default 50000
-    p1.savePolicy() # save training data after training
-    print("\033[0m"+"---------Finished training-------")
-
+    print("\n\033[36m---------------------------------\033[0m\n")
+    train_flag = input("start training(Enter) or game(other) \n\n\033[36m---------------------------------\033[0m\n")
+    if train_flag=="":
+        print("training...")
+        st.play(10000000)# training: default 50000
+        p1.savePolicy() # save training data after training
+        print("\033[0m"+"---------Finished training-------")
 
     policy_name = p1.name
     p1 = Player("computer",exp_rate=0)
-    p1.loadPolicy("policy_"+policy_name) # read training data file: policy_ + p1.name
+   # p1.loadPolicy("policy_"+policy_name) # read training data file: policy_ + p1.name
+    p1.loadPolicy("policy_44_10million")
+    #print(p1.states_value)
+    get_state_array();
     #p1.loadPolicy("policy_p1")
     p2 = HumanPlayer("human") # create human
 
